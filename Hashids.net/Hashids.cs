@@ -122,7 +122,7 @@ namespace HashidsNet
         [Obsolete("Use 'Encode' instead. The method was renamed to better explain what it actually does.")]
         public virtual string Encrypt(params int[] numbers)
         {
-            return Encode(numbers);
+			return Encode(numbers);
         }
 
         /// <summary>
@@ -196,12 +196,22 @@ namespace HashidsNet
             return ret.ToString();
         }
 
-        /// <summary>
+		        /// <summary>
         /// Encodes the provided numbers into a string
         /// </summary>
         /// <param name="numbers"></param>
         /// <returns></returns>
         public virtual string Encode(params int[] numbers)
+		{
+			return EncodeInt64(numbers.Select<int, Int64>(n => n).ToArray());
+		}
+		
+        /// <summary>
+        /// Encodes the provided numbers into a string
+        /// </summary>
+        /// <param name="numbers"></param>
+        /// <returns></returns>
+        public virtual string EncodeInt64(params Int64[] numbers)
         {
             if (numbers == null || numbers.Length == 0)
                 return string.Empty;
@@ -209,11 +219,11 @@ namespace HashidsNet
             string ret;
             var alphabet = this.alphabet;
 
-            int numbersHashInt = 0;
+            Int64 numbersHashInt = 0;
             for (var i = 0; i < numbers.Length; i++)
                 numbersHashInt += (numbers[i] % (i + 100));
 
-            var lottery = alphabet[numbersHashInt % alphabet.Length];
+            var lottery = alphabet[(int)(numbersHashInt % alphabet.Length)];
             ret = lottery.ToString();
 
             for (var i = 0; i < numbers.Length; i++)
@@ -228,8 +238,8 @@ namespace HashidsNet
 
                 if (i + 1 < numbers.Length)
                 {
-                    number %= ((int)last[0] + i);
-                    var sepsIndex = number % this.seps.Length;
+                    number %= ((Int64)last[0] + i);
+                    var sepsIndex = (int)(number % this.seps.Length);
 
                     ret += this.seps[sepsIndex];
                 }
@@ -237,14 +247,14 @@ namespace HashidsNet
 
             if (ret.Length < this.minHashLength)
             {
-                var guardIndex = (numbersHashInt + (int)ret[0]) % this.guards.Length;
+                var guardIndex = (int)((numbersHashInt + (Int64)ret[0]) % this.guards.Length);
                 var guard = this.guards[guardIndex];
 
                 ret = guard + ret;
 
                 if (ret.Length < this.minHashLength)
                 {
-                    guardIndex = (numbersHashInt + (int)ret[2]) % this.guards.Length;
+                    guardIndex = (int)((numbersHashInt + (Int64)ret[2]) % this.guards.Length);
                     guard = this.guards[guardIndex];
 
                     ret += guard;
@@ -265,14 +275,14 @@ namespace HashidsNet
             return ret.ToString();
         }
 
-        private string Hash(int input, string alphabet)
+        private string Hash(Int64 input, string alphabet)
         {
             var hash = string.Empty;
 
             do
             {
-                hash = alphabet[input % alphabet.Length] + hash;
-                input = (int)input / alphabet.Length;
+                hash = alphabet[(int)(input % alphabet.Length)] + hash;
+                input = (Int64)input / alphabet.Length;
             } while (input > 0);
 
             return hash;
@@ -330,7 +340,7 @@ namespace HashidsNet
                     ret.Add(Unhash(subHash, alphabet));
                 }
 
-                if (Encode(ret.ToArray()) != hash)
+				if (Encode(ret.ToArray()) != hash)
                     ret.Clear();
             }
 
