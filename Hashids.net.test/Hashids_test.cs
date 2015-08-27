@@ -5,9 +5,11 @@ using System.Text;
 using FluentAssertions;
 using Moq;
 using Xunit;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace HashidsNet.test
 {
+	[TestClass]
     public class Hashids_test
     {
         Hashids hashids;
@@ -20,26 +22,26 @@ namespace HashidsNet.test
             hashids = new Hashids(salt);
         }
 
-        [Fact]
-        void it_has_correct_default_alphabet()
+        [TestMethod]
+        public void it_has_correct_default_alphabet()
         {
             Hashids.DEFAULT_ALPHABET.Should().Be(defaultAlphabet);
         }
 
-        [Fact]
-        void it_has_correct_default_separators()
+        [TestMethod]
+        public void it_has_correct_default_separators()
         {
             Hashids.DEFAULT_SEPS.Should().Be(defaultSeps);
         }
 
-        [Fact]
-        void it_has_a_default_salt()
+        [TestMethod]
+        public void it_has_a_default_salt()
         {
             new Hashids().Encode(1,2,3).Should().Be("o2fXhV");
         }
 
-        [Fact]
-        void it_encodes_a_single_number()
+        [TestMethod]
+        public void it_encodes_a_single_number()
         {
             hashids.Encode(1).Should().Be("NV");
             hashids.Encode(22).Should().Be("K4");
@@ -50,8 +52,8 @@ namespace HashidsNet.test
             hashids.Encode(987654321).Should().Be("oyjYvry");
         }
 
-        [Fact]
-        void it_encodes_a_list_of_numbers()
+        [TestMethod]
+        public void it_encodes_a_list_of_numbers()
         {
             hashids.Encode(1,2,3).Should().Be("laHquq");
             hashids.Encode(2,4,6).Should().Be("44uotN");
@@ -70,14 +72,14 @@ namespace HashidsNet.test
               Should().Be("p2xkL3CK33JjcrrZ8vsw4YRZueZX9k");
         }
 
-        [Fact]
-        void it_returns_an_empty_string_if_no_numbers()
+        [TestMethod]
+        public void it_returns_an_empty_string_if_no_numbers()
         {
             hashids.Encode().Should().Be(string.Empty);
         }
 
-        [Fact]
-        void it_can_encodes_to_a_minimum_length()
+        [TestMethod]
+        public void it_can_encodes_to_a_minimum_length()
         {
             var h = new Hashids(salt, 18);
             h.Encode(1).Should().Be("aJEDngB0NV05ev1WwP");
@@ -86,28 +88,28 @@ namespace HashidsNet.test
                 Should().Be("pLMlCWnJSXr1BSpKgqUwbJ7oimr7l6");
         }
 
-        [Fact]
-        void it_can_encode_with_a_custom_alphabet()
+        [TestMethod]
+        public void it_can_encode_with_a_custom_alphabet()
         {
             var h = new Hashids(salt, 0, "ABCDEFGhijklmn34567890-:");
             h.Encode(1, 2, 3, 4, 5).Should().Be("6nhmFDikA0");
         }
 
-        [Fact]
-        void it_does_not_produce_repeating_patterns_for_identical_numbers()
+        [TestMethod]
+        public void it_does_not_produce_repeating_patterns_for_identical_numbers()
         {
             hashids.Encode(5, 5, 5, 5).Should().Be("1Wc8cwcE");
         }
 
-        [Fact]
-        void it_does_not_produce_repeating_patterns_for_incremented_numbers()
+        [TestMethod]
+        public void it_does_not_produce_repeating_patterns_for_incremented_numbers()
         {
             hashids.Encode(1, 2, 3, 4, 5, 6, 7, 8, 9, 10).
                 Should().Be("kRHnurhptKcjIDTWC3sx");
         }
 
-        [Fact]
-        void it_does_not_produce_similarities_between_incrementing_number_hashes()
+        [TestMethod]
+        public void it_does_not_produce_similarities_between_incrementing_number_hashes()
         {
             hashids.Encode(1).Should().Be("NV");
             hashids.Encode(2).Should().Be("6m");
@@ -116,8 +118,8 @@ namespace HashidsNet.test
             hashids.Encode(5).Should().Be("rD");
         }
 
-        [Fact]
-        void it_encode_hex_string()
+        [TestMethod]
+        public void it_encode_hex_string()
         {
             hashids.EncodeHex("FA").Should().Be("lzY");
             hashids.EncodeHex("26dd").Should().Be("MemE");
@@ -131,14 +133,14 @@ namespace HashidsNet.test
             //hashids.EncryptHex("20015111d").Should().Be("ooweQVNB");
         }
 
-        [Fact]
-        void it_returns_an_empty_string_if_passed_non_hex_string()
+        [TestMethod]
+        public void it_returns_an_empty_string_if_passed_non_hex_string()
         {
             hashids.EncodeHex("XYZ123").Should().Be(string.Empty);
         }
 
-        [Fact]
-        void it_decodes_an_ecrypted_number()
+        [TestMethod]
+        public void it_decodes_an_ecrypted_number()
         {
             hashids.Decode("NkK9").Should().Equal(new [] { 12345 });
             hashids.Decode("5O8yp5P").Should().Equal(new [] { 666555444 });
@@ -152,8 +154,8 @@ namespace HashidsNet.test
 
         }
 
-        [Fact]
-        void it_decodes_a_list_of_encrypted_numbers()
+        [TestMethod]
+        public void it_decodes_a_list_of_encrypted_numbers()
         {
             hashids.Decode("1gRYUwKxBgiVuX").Should().Equal(new [] { 66655,5444333,2,22 });
             hashids.Decode("aBMswoO2UB3Sj").Should().Equal(new [] { 683, 94108, 123, 5 });
@@ -165,16 +167,16 @@ namespace HashidsNet.test
             hashids.Decode("glSgV").Should().Equal(new[] { 13, 89 });
         }
 
-        [Fact]
-        void it_does_not_decode_with_a_different_salt()
+        [TestMethod]
+        public void it_does_not_decode_with_a_different_salt()
         {
             var peppers = new Hashids("this is my pepper");
             hashids.Decode("NkK9").Should().Equal(new []{ 12345 });
             peppers.Decode("NkK9").Should().Equal(new int [0]);
         }
 
-        [Fact]
-        void it_can_decode_from_a_hash_with_a_minimum_length()
+        [TestMethod]
+        public void it_can_decode_from_a_hash_with_a_minimum_length()
         {
             var h = new Hashids(salt, 8);
             h.Decode("gB0NV05e").Should().Equal(new [] {1});
@@ -182,48 +184,57 @@ namespace HashidsNet.test
             h.Decode("KQcmkIW8hX").Should().Equal(new[] { 5, 200, 195, 1 });
         }
 
-        [Fact]
-        void it_decode_an_encrypted_number()
+        [TestMethod]
+        public void it_decode_an_encrypted_number()
         {
             hashids.DecodeHex("lzY").Should().Be("FA");
             hashids.DecodeHex("eBMrb").Should().Be("FF1A");
             hashids.DecodeHex("D9NPE").Should().Be("12ABC");
         }
 
-        [Fact]
-        void it_raises_an_argument_null_exception_when_alphabet_is_null()
+        [TestMethod]
+        public void it_raises_an_argument_null_exception_when_alphabet_is_null()
         {
             Action invocation = () => new Hashids(alphabet: null);
             invocation.ShouldThrow<ArgumentNullException>();
         }
 
-        [Fact]
-        void it_raises_an_argument_null_exception_if_alphabet_contains_less_than_4_unique_characters()
+        [TestMethod]
+        public void it_raises_an_argument_null_exception_if_alphabet_contains_less_than_4_unique_characters()
         {
             Action invocation = () => new Hashids(alphabet: "aadsss");
             invocation.ShouldThrow<ArgumentException>();
         }
 
-        [Fact]
-        void it_encodes_and_decodes_numbers_starting_with_0()
+        [TestMethod]
+        public void it_encodes_and_decodes_numbers_starting_with_0()
         {
             var hash = hashids.Encode(0, 1, 2);
             hashids.Decode(hash).Should().Equal(new[] { 0, 1, 2 });
         }
 
-        [Fact]
-        void it_encodes_and_decodes_numbers_ending_with_0()
+        [TestMethod]
+        public void it_encodes_and_decodes_numbers_ending_with_0()
         {
             var hash = hashids.Encode(1, 2, 0);
             hashids.Decode(hash).Should().Equal(new[] { 1, 2, 0 });
         }
 
-        [Fact]
-        void our_public_methods_can_be_mocked()
+        [TestMethod]
+        public void our_public_methods_can_be_mocked()
         {
             var mock = new Mock<Hashids>();
             mock.Setup(hashids => hashids.Encode(It.IsAny<int[]>())).Returns("It works");
             mock.Object.Encode(new[] { 1 }).Should().Be("It works");
         }
+
+
+		[TestMethod]
+		public void it_encodes_and_decodes_with_small_alphabet()
+		{
+			Hashids hids = new Hashids("Extra Salty, please", 8, "ABCDEFGHJKLMNPQRSTUVWXYZ23456789");
+			var hash = hids.Encode(1030, 933393);
+			System.Diagnostics.Debug.WriteLine(hash);
+		}
     }
 }
